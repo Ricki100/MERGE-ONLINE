@@ -1,0 +1,8 @@
+{
+    "require": {
+        "phpoffice/phpspreadsheet": "^4.2",
+        "ext-gd": "*",
+        "ext-zip": "*",
+        "mpdf/mpdf": "^8.2"
+    }
+}

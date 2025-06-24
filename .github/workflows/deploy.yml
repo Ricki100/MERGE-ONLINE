@@ -1,0 +1,27 @@
+name: Deploy to Hostinger
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Deploy to Hostinger
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+        with:
+          username: ${{ secrets.HOSTINGER_FTP_USERNAME }}
+          server: ${{ secrets.HOSTINGER_FTP_HOST }}
+          ssh_private_key: ${{ secrets.HOSTINGER_SSH_KEY }}
+          local_path: './'
+          remote_path: ${{ secrets.HOSTINGER_REMOTE_PATH }}
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/.env*
+            **/README.md
+            **/.github/** 
