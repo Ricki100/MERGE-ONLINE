@@ -223,7 +223,7 @@ session_start();
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg">
         <div class="container">
-            <a class="navbar-brand" href="index.php">
+            <a class="navbar-brand" href="/">
                 <i class="fas fa-layer-group me-2"></i>Font Merge
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -232,22 +232,25 @@ session_start();
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="index.php">Home</a>
+                        <a class="nav-link" href="/">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="services.php">Services</a>
+                        <a class="nav-link active" href="/services">Services</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="about.php">About</a>
+                        <a class="nav-link" href="/about">About</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="contact.php">Contact</a>
+                        <a class="nav-link" href="https://fontmerge.online/blog/">Blog</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="privacy.php">Privacy</a>
+                        <a class="nav-link" href="/contact">Contact</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link btn btn-primary text-white px-3 ms-2" href="app.php">Try Now</a>
+                        <a class="nav-link" href="/privacy">Privacy</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-primary text-white px-3 ms-2" href="/app">Try Now</a>
                     </li>
                 </ul>
             </div>
@@ -351,7 +354,7 @@ session_start();
                     <div class="white-label-card text-center">
                         <h3>🔹 White-Label Automation</h3>
                         <p>Need something custom? We offer white-label image generation portals for agencies and organizations. Get your own branded version of Font Merge with custom features and integrations.</p>
-                        <a href="contact.php" class="btn btn-light btn-lg mt-3">
+                        <a href="/contact" class="btn btn-light btn-lg mt-3">
                             <i class="fas fa-envelope me-2"></i>Contact Us for Custom Solutions
                         </a>
                     </div>
@@ -365,7 +368,7 @@ session_start();
         <div class="container text-center">
             <h2 class="mb-4">Ready to Start Creating?</h2>
             <p class="lead mb-4">Join thousands of users who are already saving time with Font Merge</p>
-            <a href="app.php" class="btn btn-primary btn-lg">
+            <a href="/app" class="btn btn-primary btn-lg">
                 <i class="fas fa-rocket me-2"></i>Start Generating Images Now
             </a>
         </div>
@@ -385,16 +388,16 @@ session_start();
                 <div class="col-lg-2 mb-4">
                     <h5>Product</h5>
                     <ul class="list-unstyled">
-                        <li><a href="services.php">Services</a></li>
-                        <li><a href="app.php">Try Now</a></li>
-                        <li><a href="about.php">About</a></li>
+                        <li><a href="/services">Services</a></li>
+                        <li><a href="/app">Try Now</a></li>
+                        <li><a href="/about">About</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-2 mb-4">
                     <h5>Support</h5>
                     <ul class="list-unstyled">
-                        <li><a href="contact.php">Contact</a></li>
-                        <li><a href="privacy.php">Privacy</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                        <li><a href="/privacy">Privacy</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-4 mb-4">
@@ -402,7 +405,7 @@ session_start();
                     <p class="text-muted">
                         Have questions? We're here to help you create amazing images from your data.
                     </p>
-                    <a href="contact.php" class="btn btn-outline-light">Get in Touch</a>
+                    <a href="/contact" class="btn btn-outline-light">Get in Touch</a>
                 </div>
             </div>
             <div class="footer-bottom">

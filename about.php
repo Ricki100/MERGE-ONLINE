@@ -169,7 +169,7 @@ session_start();
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg">
         <div class="container">
-            <a class="navbar-brand" href="index.php">
+            <a class="navbar-brand" href="/">
                 <i class="fas fa-layer-group me-2"></i>Font Merge
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -178,22 +178,25 @@ session_start();
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="index.php">Home</a>
+                        <a class="nav-link" href="/">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="services.php">Services</a>
+                        <a class="nav-link" href="/services">Services</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="about.php">About</a>
+                        <a class="nav-link active" href="/about">About</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="contact.php">Contact</a>
+                        <a class="nav-link" href="https://fontmerge.online/blog/">Blog</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="privacy.php">Privacy</a>
+                        <a class="nav-link" href="/contact">Contact</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link btn btn-primary text-white px-3 ms-2" href="app.php">Try Now</a>
+                        <a class="nav-link" href="/privacy">Privacy</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-primary text-white px-3 ms-2" href="/app">Try Now</a>
                     </li>
                 </ul>
             </div>
@@ -233,7 +236,7 @@ session_start();
                         </p>
 
                         <div class="text-center mt-4">
-                                            <a href="app.php" class="btn btn-primary btn-lg">
+                                            <a href="/app" class="btn btn-primary btn-lg">
                     <i class="fas fa-rocket me-2"></i>Start Using Font Merge
                 </a>
                         </div>
@@ -257,16 +260,16 @@ session_start();
                 <div class="col-lg-2 mb-4">
                     <h5>Product</h5>
                     <ul class="list-unstyled">
-                        <li><a href="services.php">Services</a></li>
-                        <li><a href="app.php">Try Now</a></li>
-                        <li><a href="about.php">About</a></li>
+                        <li><a href="/services">Services</a></li>
+                        <li><a href="/app">Try Now</a></li>
+                        <li><a href="/about">About</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-2 mb-4">
                     <h5>Support</h5>
                     <ul class="list-unstyled">
-                        <li><a href="contact.php">Contact</a></li>
-                        <li><a href="privacy.php">Privacy</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                        <li><a href="/privacy">Privacy</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-4 mb-4">
