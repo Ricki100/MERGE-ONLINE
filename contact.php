@@ -373,7 +373,7 @@ session_start();
                     <h5>Product</h5>
                     <ul class="list-unstyled">
                         <li><a href="/services">Services</a></li>
-                        <li><a href="/app" class="try-now-btn">TRY NOW</a></li>
+                        <li><a href="/app">Try Now</a></li>
                         <li><a href="/about">About</a></li>
                     </ul>
                 </div>
