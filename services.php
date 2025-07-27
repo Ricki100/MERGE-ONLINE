@@ -207,6 +207,63 @@ session_start();
             color: #9ca3af;
         }
 
+        /* Standardized TRY NOW Button Style */
+        .try-now-btn {
+            background: #2563eb;
+            color: white !important;
+            border-radius: 8px;
+            padding: 12px 24px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: none;
+            display: inline-block;
+            text-align: center;
+            transition: background-color 0.3s ease;
+            box-shadow: none;
+        }
+
+        .try-now-btn:hover {
+            background: #1d4ed8;
+            color: white !important;
+            text-decoration: none;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .try-now-btn:active {
+            background: #1e40af;
+        }
+
+        .navbar-nav .nav-link.btn {
+            background: #2563eb;
+            color: white !important;
+            border-radius: 8px;
+            padding: 12px 24px;
+            margin-left: 1rem;
+            transition: background-color 0.3s ease;
+            font-weight: 700;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: none;
+            border: none;
+        }
+
+        .navbar-nav .nav-link.btn:hover {
+            background: #1d4ed8;
+            transform: none;
+            box-shadow: none;
+            border: none;
+        }
+
+        .navbar-nav .nav-link.btn:active {
+            background: #1e40af;
+            transform: none;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .page-header h1 {
@@ -250,7 +307,7 @@ session_start();
                         <a class="nav-link" href="/privacy">Privacy</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link btn btn-primary text-white px-3 ms-2" href="/app">Try Now</a>
+                        <a class="nav-link btn try-now-btn" href="/app">TRY NOW</a>
                     </li>
                 </ul>
             </div>
@@ -368,8 +425,8 @@ session_start();
         <div class="container text-center">
             <h2 class="mb-4">Ready to Start Creating?</h2>
             <p class="lead mb-4">Join thousands of users who are already saving time with Font Merge</p>
-            <a href="/app" class="btn btn-primary btn-lg">
-                <i class="fas fa-rocket me-2"></i>Start Generating Images Now
+            <a href="/app" class="try-now-btn">
+                TRY NOW
             </a>
         </div>
     </section>
@@ -389,7 +446,7 @@ session_start();
                     <h5>Product</h5>
                     <ul class="list-unstyled">
                         <li><a href="/services">Services</a></li>
-                        <li><a href="/app">Try Now</a></li>
+                        <li><a href="/app" class="try-now-btn">TRY NOW</a></li>
                         <li><a href="/about">About</a></li>
                     </ul>
                 </div>

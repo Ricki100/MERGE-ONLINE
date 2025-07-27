@@ -71,28 +71,61 @@ session_start();
             color: var(--primary-color) !important;
         }
 
-        .navbar-nav .nav-link.btn {
-            background: var(--primary-color);
+        /* Standardized TRY NOW Button Style */
+        .try-now-btn {
+            background: #2563eb;
             color: white !important;
-            border-radius: 25px;
-            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            padding: 12px 24px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: none;
+            display: inline-block;
+            text-align: center;
+            transition: background-color 0.3s ease;
+            box-shadow: none;
+        }
+
+        .try-now-btn:hover {
+            background: #1d4ed8;
+            color: white !important;
+            text-decoration: none;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .try-now-btn:active {
+            background: #1e40af;
+        }
+
+        .navbar-nav .nav-link.btn {
+            background: #2563eb;
+            color: white !important;
+            border-radius: 8px;
+            padding: 12px 24px;
             margin-left: 1rem;
-            transition: all 0.3s ease;
-            font-weight: 600;
-            font-size: 1.1rem;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
-            border: 2px solid var(--primary-color);
+            transition: background-color 0.3s ease;
+            font-weight: 700;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: none;
+            border: none;
         }
 
         .navbar-nav .nav-link.btn:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
-            border-color: var(--primary-dark);
+            background: #1d4ed8;
+            transform: none;
+            box-shadow: none;
+            border: none;
         }
 
         .navbar-nav .nav-link.btn:active {
-            transform: translateY(0);
+            background: #1e40af;
+            transform: none;
         }
 
         /* Hero Section */
@@ -389,7 +422,7 @@ session_start();
                         <a class="nav-link" href="/privacy">Privacy</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link btn btn-primary text-white px-3 ms-2" href="/app">Try Now</a>
+                        <a class="nav-link btn try-now-btn" href="/app">TRY NOW</a>
                     </li>
                 </ul>
             </div>
@@ -580,7 +613,7 @@ session_start();
                     <h5>Product</h5>
                     <ul class="list-unstyled">
                         <li><a href="/services">Services</a></li>
-                        <li><a href="/app">Try Now</a></li>
+                        <li><a href="/app" class="try-now-btn">TRY NOW</a></li>
                         <li><a href="/about">About</a></li>
                     </ul>
                 </div>
