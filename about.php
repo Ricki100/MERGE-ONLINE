@@ -6,8 +6,8 @@ session_start();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Data Merge | Our Mission & Vision</title>
-    <meta name="description" content="Learn about the team behind Data Merge — a web-based tool built to automate image creation using Excel/CSV data overlays.">
+    <title>About Font Merge | Our Mission & Vision</title>
+    <meta name="description" content="Learn about the team behind Font Merge — a web-based tool built to automate image creation using Excel/CSV data overlays.">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -170,7 +170,7 @@ session_start();
     <nav class="navbar navbar-expand-lg">
         <div class="container">
             <a class="navbar-brand" href="index.php">
-                <i class="fas fa-layer-group me-2"></i>Data Merge
+                <i class="fas fa-layer-group me-2"></i>Font Merge
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -203,7 +203,7 @@ session_start();
     <!-- Page Header -->
     <section class="page-header">
         <div class="container">
-            <h1>About Data Merge</h1>
+            <h1>About Font Merge</h1>
         </div>
     </section>
 
@@ -214,7 +214,7 @@ session_start();
                 <div class="col-lg-8">
                     <div class="content-card">
                         <p>
-                            Data Merge was created for one reason: to help you generate personalized images in large volumes — without design tools or code.
+                            Font Merge was created for one reason: to help you generate personalized images in large volumes — without design tools or code.
                         </p>
                         
                         <p>
@@ -224,7 +224,7 @@ session_start();
                         <div class="highlight-box">
                             <h3><i class="fas fa-code me-2"></i>Built with Modern Technology</h3>
                             <p>
-                                Built in PHP using GD and file handling libraries, Data Merge combines speed, control, and simplicity in one browser-based platform. No hidden charges, no steep learning curve.
+                                Built in PHP using GD and file handling libraries, Font Merge combines speed, control, and simplicity in one browser-based platform. No hidden charges, no steep learning curve.
                             </p>
                         </div>
 
@@ -233,9 +233,9 @@ session_start();
                         </p>
 
                         <div class="text-center mt-4">
-                            <a href="app.php" class="btn btn-primary btn-lg">
-                                <i class="fas fa-rocket me-2"></i>Start Using Data Merge
-                            </a>
+                                            <a href="app.php" class="btn btn-primary btn-lg">
+                    <i class="fas fa-rocket me-2"></i>Start Using Font Merge
+                </a>
                         </div>
                     </div>
                 </div>
@@ -248,7 +248,7 @@ session_start();
         <div class="container">
             <div class="row">
                 <div class="col-lg-4 mb-4">
-                    <h5><i class="fas fa-layer-group me-2"></i>Data Merge</h5>
+                    <h5><i class="fas fa-layer-group me-2"></i>Font Merge</h5>
                     <p class="text-muted">
                         Transform your data into stunning images instantly. 
                         No coding required, no software to install.
@@ -278,7 +278,7 @@ session_start();
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2024 Data Merge. All rights reserved.</p>
+                <p>&copy; 2024 Font Merge. All rights reserved.</p>
             </div>
         </div>
     </footer>

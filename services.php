@@ -6,8 +6,8 @@ session_start();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Services | Generate Custom Images from Data with Data Merge</title>
-    <meta name="description" content="Discover what you can create with Data Merge — from certificates and ID cards to banners and branded visuals using your spreadsheet data.">
+    <title>Services | Generate Custom Images from Data with Font Merge</title>
+    <meta name="description" content="Discover what you can create with Font Merge — from certificates and ID cards to banners and branded visuals using your spreadsheet data.">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -224,7 +224,7 @@ session_start();
     <nav class="navbar navbar-expand-lg">
         <div class="container">
             <a class="navbar-brand" href="index.php">
-                <i class="fas fa-layer-group me-2"></i>Data Merge
+                <i class="fas fa-layer-group me-2"></i>Font Merge
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -257,7 +257,7 @@ session_start();
     <!-- Page Header -->
     <section class="page-header">
         <div class="container">
-            <h1>What You Can Do With Data Merge</h1>
+            <h1>What You Can Do With Font Merge</h1>
         </div>
     </section>
 
@@ -350,7 +350,7 @@ session_start();
                 <div class="col-lg-8">
                     <div class="white-label-card text-center">
                         <h3>🔹 White-Label Automation</h3>
-                        <p>Need something custom? We offer white-label image generation portals for agencies and organizations. Get your own branded version of Data Merge with custom features and integrations.</p>
+                        <p>Need something custom? We offer white-label image generation portals for agencies and organizations. Get your own branded version of Font Merge with custom features and integrations.</p>
                         <a href="contact.php" class="btn btn-light btn-lg mt-3">
                             <i class="fas fa-envelope me-2"></i>Contact Us for Custom Solutions
                         </a>
@@ -364,7 +364,7 @@ session_start();
     <section class="py-5">
         <div class="container text-center">
             <h2 class="mb-4">Ready to Start Creating?</h2>
-            <p class="lead mb-4">Join thousands of users who are already saving time with Data Merge</p>
+            <p class="lead mb-4">Join thousands of users who are already saving time with Font Merge</p>
             <a href="app.php" class="btn btn-primary btn-lg">
                 <i class="fas fa-rocket me-2"></i>Start Generating Images Now
             </a>
@@ -376,7 +376,7 @@ session_start();
         <div class="container">
             <div class="row">
                 <div class="col-lg-4 mb-4">
-                    <h5><i class="fas fa-layer-group me-2"></i>Data Merge</h5>
+                    <h5><i class="fas fa-layer-group me-2"></i>Font Merge</h5>
                     <p class="text-muted">
                         Transform your data into stunning images instantly. 
                         No coding required, no software to install.
@@ -406,7 +406,7 @@ session_start();
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2024 Data Merge. All rights reserved.</p>
+                <p>&copy; 2024 Font Merge. All rights reserved.</p>
             </div>
         </div>
     </footer>

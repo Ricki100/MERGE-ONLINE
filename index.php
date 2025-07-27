@@ -6,9 +6,9 @@ session_start();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Merge | Convert CSV or Excel to Custom Images Online</title>
-    <meta name="description" content="Upload a template, add CSV/Excel data, and generate customized images with text and image overlays. 100% web-based. No coding or software installation required.">
-    <meta name="keywords" content="data merge, image generator, CSV to image, Excel to image, certificate generator, bulk image creation">
+    <title>Font Merge | Data Merge Online - Convert CSV or Excel to Custom Images</title>
+    <meta name="description" content="Font Merge - The best data merge online tool. Upload a template, add CSV/Excel data, and generate customized images with text and image overlays. 100% web-based. No coding or software installation required.">
+    <meta name="keywords" content="font merge, data merge, data merge online, image generator, CSV to image, Excel to image, certificate generator, bulk image creation">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -71,45 +71,153 @@ session_start();
             color: var(--primary-color) !important;
         }
 
+        .navbar-nav .nav-link.btn {
+            background: var(--primary-color);
+            color: white !important;
+            border-radius: 25px;
+            padding: 0.75rem 2rem;
+            margin-left: 1rem;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+            border: 2px solid var(--primary-color);
+        }
+
+        .navbar-nav .nav-link.btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+            border-color: var(--primary-dark);
+        }
+
+        .navbar-nav .nav-link.btn:active {
+            transform: translateY(0);
+        }
+
         /* Hero Section */
         .hero-section {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 6rem 0 4rem;
+            padding: 8rem 0 6rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="60" r="0.5" fill="white" opacity="0.1"/><circle cx="90" cy="40" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            pointer-events: none;
+        }
+
+        .hero-section::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 80%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            transform: rotate(15deg);
+            pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
             text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            padding: 0.5rem 1.5rem;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .hero-badge i {
+            margin-right: 0.5rem;
+            color: #fbbf24;
         }
 
         .hero-section h1 {
-            font-size: 3.5rem;
+            font-size: 3rem;
             font-weight: 700;
             margin-bottom: 1.5rem;
             line-height: 1.2;
+            color: white;
         }
 
-        .hero-section .lead {
+        .hero-section .hero-subtitle {
             font-size: 1.25rem;
             margin-bottom: 2rem;
             opacity: 0.9;
+            font-weight: 400;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
+
+
         .cta-button {
-            background: #ffffff;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
             color: var(--primary-color);
-            padding: 1rem 2rem;
+            padding: 1.25rem 3rem;
             border-radius: 50px;
             text-decoration: none;
-            font-weight: 600;
-            display: inline-block;
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: inline-flex;
+            align-items: center;
             transition: all 0.3s ease;
             border: 2px solid transparent;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
         }
 
         .cta-button:hover {
-            background: transparent;
-            color: white;
-            border-color: white;
-            transform: translateY(-2px);
+            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
         }
+
+        .cta-button i {
+            margin-right: 0.75rem;
+            font-size: 1.2rem;
+        }
+
+
 
         /* Quick Steps Section */
         .quick-steps {
@@ -214,11 +322,15 @@ session_start();
 
         /* Responsive */
         @media (max-width: 768px) {
-            .hero-section h1 {
-                font-size: 2.5rem;
+            .hero-section {
+                padding: 4rem 0 3rem;
             }
             
-            .hero-section .lead {
+            .hero-section h1 {
+                font-size: 2.2rem;
+            }
+            
+            .hero-section .hero-subtitle {
                 font-size: 1.1rem;
             }
         }
@@ -251,7 +363,7 @@ session_start();
     <nav class="navbar navbar-expand-lg">
         <div class="container">
             <a class="navbar-brand" href="index.php">
-                <i class="fas fa-layer-group me-2"></i>Data Merge
+                <i class="fas fa-layer-group me-2"></i>Font Merge
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -284,19 +396,28 @@ session_start();
     <!-- Hero Section -->
     <section class="hero-section">
         <div class="container">
-            <h1>Turn Your Data into Stunning Images — Instantly</h1>
-            <p class="lead">
-                Need to create certificates, product visuals, ID cards, or digital badges at scale? 
-                Data Merge is a fast, secure online tool that lets you upload a design template and 
-                spreadsheet — and generate multiple customized images with just a few clicks.
-            </p>
-            <p class="lead">
-                Upload your PNG or JPG template, import Excel/CSV data, place text or image overlays, 
-                and download your final images — all online.
-            </p>
-            <a href="app.php" class="cta-button">
-                🎯 Try it now — Start Generating
-            </a>
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <i class="fas fa-star"></i>
+                    The #1 Data Merge Tool Online
+                </div>
+                
+                <h1>Transform Data Into Stunning Visuals</h1>
+                
+                <p class="hero-subtitle">
+                    Create certificates, product visuals, ID cards, and digital badges at scale with our powerful online data merge tool. 
+                    Upload templates, import data, and generate hundreds of customized images instantly.
+                </p>
+                
+
+                
+                <a href="app.php" class="cta-button">
+                    <i class="fas fa-rocket"></i>
+                    Start Creating Now
+                </a>
+                
+
+            </div>
         </div>
     </section>
 
@@ -341,7 +462,7 @@ session_start();
                             <i class="fas fa-eye"></i>
                         </div>
                         <div class="step-number">4</div>
-                        <h4>Preview Up to 10 Images</h4>
+                        <h4>Preview All Images</h4>
                         <p class="text-muted">See how your designs will look with different data entries</p>
                     </div>
                 </div>
@@ -372,7 +493,7 @@ session_start();
     <!-- Why Choose Section -->
     <section class="features-section">
         <div class="container">
-            <h2 class="section-title">Why Choose Data Merge?</h2>
+            <h2 class="section-title">Why Choose Font Merge?</h2>
             <div class="row">
                 <div class="col-lg-6">
                     <div class="feature-item">
@@ -446,7 +567,7 @@ session_start();
         <div class="container">
             <div class="row">
                 <div class="col-lg-4 mb-4">
-                    <h5><i class="fas fa-layer-group me-2"></i>Data Merge</h5>
+                    <h5><i class="fas fa-layer-group me-2"></i>Font Merge</h5>
                     <p class="text-muted">
                         Transform your data into stunning images instantly. 
                         No coding required, no software to install.
@@ -476,7 +597,7 @@ session_start();
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2024 Data Merge. All rights reserved.</p>
+                <p>&copy; 2024 Font Merge. All rights reserved.</p>
             </div>
         </div>
     </footer>
