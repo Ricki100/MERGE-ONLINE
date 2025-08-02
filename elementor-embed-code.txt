@@ -1,0 +1,29 @@
+<!-- Font Merge Tool Embed Code for Elementor -->
+<!-- Copy this code into an Elementor HTML Widget -->
+
+<div class="font-merge-container" style="width: 100%; max-width: 1200px; margin: 0 auto; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+    <iframe 
+        src="https://yourdomain.com/elementor-app.php?embedded=1" 
+        style="width: 100%; height: 700px; border: none; display: block;"
+        title="Font Merge Tool"
+        allow="camera; microphone; geolocation"
+        sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-downloads">
+    </iframe>
+</div>
+
+<!-- Responsive CSS for mobile devices -->
+<style>
+@media (max-width: 768px) {
+    .font-merge-container iframe {
+        height: 600px !important;
+    }
+}
+</style>
+
+<!-- INSTRUCTIONS:
+1. Replace "https://yourdomain.com" with your actual domain
+2. Upload elementor-app.php to your server
+3. Add this code to an Elementor HTML Widget
+4. Place the widget where you want the app to appear
+5. Add other Elementor widgets above and below as needed
+--> 
