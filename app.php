@@ -290,17 +290,6 @@ session_start();
         </div>
         <!-- Main Template Area -->
         <div class="template-area">
-            <div class="card p-2 mb-4 font-section" id="fontSectionCard" style="display:none; max-width:700px; margin:0 auto 32px auto;">
-                <div class="mb-2">
-                    <label class="form-label" style="font-size:1.2rem; font-weight:600;">Paste Google Fonts link or CSS URL</label>
-                    <div id="fontUrlSection">
-                        <input type="text" id="fontUrlInput" class="form-control mb-2" placeholder="https://fonts.googleapis.com/css2?family=Share+Tech&display=swap">
-                        <button class="btn btn-outline-primary w-100 mb-2" id="addFontUrlBtn" type="button">Add Font</button>
-                    </div>
-                    <div id="fontUrlStatus" class="small text-muted mb-2"></div>
-                    <a href="#" id="fontUrlHelpLink" class="small text-primary d-block mb-1">How to get the correct Google Fonts URL?</a>
-                </div>
-            </div>
             <div class="template-preview-box" id="templatePreview">
                 <span class="text-muted">Template preview will appear here</span>
                 <div class="overlay-boxes" id="overlayBoxes"></div>
