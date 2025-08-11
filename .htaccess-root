@@ -1,6 +1,0 @@
-# Redirect /app to /app/app.php
-RewriteEngine On
-RewriteRule ^app/?$ /app/app.php [L]
-
-# Handle any /app/ subdirectories
-RewriteRule ^app/(.*)$ /app/$1 [L] 

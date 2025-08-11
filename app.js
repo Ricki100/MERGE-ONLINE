@@ -26,6 +26,7 @@ const boxEditor = document.getElementById('boxEditor');
 const boxesContainer = document.getElementById('boxesContainer');
 const generateBtn = document.getElementById('generateBtn');
 const downloadBtn = document.getElementById('downloadBtn');
+const downloadPdfBtn = document.getElementById('downloadPdfBtn');
 const previewsContainer = document.getElementById('previewsContainer');
 const fieldSelect = document.getElementById('fieldSelect');
 const addTextBoxBtn = document.getElementById('addTextBoxBtn');
@@ -115,6 +116,115 @@ downloadBtn.addEventListener('click', async function() {
     }
 });
 
+// PDF Download functionality
+downloadPdfBtn.addEventListener('click', async function() {
+    if (!templateFile || !csvData || boxes.length === 0) return;
+    downloadPdfBtn.disabled = true;
+    downloadPdfBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating PDF...';
+
+    try {
+        // Capture the template preview WITH text overlays (same as image generation)
+        const templatePreview = document.getElementById('templatePreview');
+        const img = document.getElementById('templateImg');
+        let scale = 2;
+        if (img && img.naturalWidth && img.width) {
+            scale = img.naturalWidth / img.width;
+        }
+        
+        // Use the same html2canvas approach as image generation
+        const options = {
+            scale: scale,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: null,
+            logging: false,
+            onclone: (clonedDoc) => {
+                const clonedPreview = clonedDoc.getElementById('templatePreview');
+                if (clonedPreview) {
+                    const selectedBoxes = clonedPreview.querySelectorAll('.selected');
+                    selectedBoxes.forEach(box => box.classList.remove('selected'));
+                    const allBoxes = clonedPreview.querySelectorAll('.draggable-box');
+                    allBoxes.forEach(box => {
+                        box.style.border = 'none';
+                        box.style.background = 'transparent';
+                        box.style.boxShadow = 'none';
+                    });
+                }
+            }
+        };
+        
+        // Wait for all fonts and DOM to be ready (same as image generation)
+        await document.fonts.ready;
+        await new Promise(requestAnimationFrame);
+        const canvas = await html2canvas(templatePreview, options);
+        
+        // Crop to just the image area (same as image generation)
+        let cropX = 0, cropY = 0, cropW = canvas.width, cropH = canvas.height;
+        if (img) {
+            const previewRect = templatePreview.getBoundingClientRect();
+            const imgRect = img.getBoundingClientRect();
+            cropX = Math.round((imgRect.left - previewRect.left) * scale);
+            cropY = Math.round((imgRect.top - previewRect.top) * scale);
+            cropW = Math.round(img.naturalWidth);
+            cropH = Math.round(img.naturalHeight);
+        }
+        
+        const croppedCanvas = document.createElement('canvas');
+        croppedCanvas.width = cropW;
+        croppedCanvas.height = cropH;
+        const ctx = croppedCanvas.getContext('2d');
+        ctx.drawImage(canvas, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
+        
+        // Convert to image data
+        const imgData = croppedCanvas.toDataURL('image/jpeg', 0.9);
+        const imgElement = new Image();
+        imgElement.src = imgData;
+
+        // Wait for image to load
+        await new Promise((resolve) => {
+            imgElement.onload = resolve;
+        });
+
+        // Create PDF
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        
+        // Get A4 dimensions in mm
+        const pageWidth = 210;
+        const pageHeight = 297;
+        
+        // Calculate image dimensions to fit on page
+        const imgAspectRatio = imgElement.width / imgElement.height;
+        const pageAspectRatio = pageWidth / pageHeight;
+        
+        let imgWidth, imgHeight;
+        if (imgAspectRatio > pageAspectRatio) {
+            imgWidth = pageWidth;
+            imgHeight = pageWidth / imgAspectRatio;
+        } else {
+            imgHeight = pageHeight;
+            imgWidth = pageHeight * imgAspectRatio;
+        }
+        
+        // Center image on page
+        const x = (pageWidth - imgWidth) / 2;
+        const y = (pageHeight - imgHeight) / 2;
+        
+        // Add image to PDF (this now includes the text overlays)
+        pdf.addImage(imgData, 'JPEG', x, y, imgWidth, imgHeight);
+        
+        // Save PDF
+        pdf.save(`template_${currentRecord + 1}.pdf`);
+
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        alert('Error generating PDF. Please try again.');
+    } finally {
+        downloadPdfBtn.disabled = false;
+        downloadPdfBtn.innerHTML = '<i class="fas fa-file-pdf"></i> Download as PDF';
+    }
+});
+
 // File handling functions
 function handleTemplateUpload(e) {
     const file = e.target.files[0];
@@ -125,31 +235,126 @@ function handleTemplateUpload(e) {
 
 function handleTemplateFile(file) {
     templateFile = file;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        templatePreview.innerHTML = `<img src="${e.target.result}" class="preview-image" id="templateImg">` + '<div class="overlay-boxes" id="overlayBoxes"></div>';
-        // Get natural size
-        const img = document.getElementById('templateImg');
-        img.onload = function() {
-            templateNaturalWidth = img.naturalWidth;
-            templateNaturalHeight = img.naturalHeight;
-            renderOverlayBoxes();
+    
+    if (file.type === 'application/pdf') {
+        // Handle PDF file
+        handlePDFFile(file);
+    } else {
+        // Handle image file
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            templatePreview.innerHTML = `<img src="${e.target.result}" class="preview-image" id="templateImg">` + '<div class="overlay-boxes" id="overlayBoxes"></div>';
+            // Get natural size
+            const img = document.getElementById('templateImg');
+            img.onload = function() {
+                templateNaturalWidth = img.naturalWidth;
+                templateNaturalHeight = img.naturalHeight;
+                renderOverlayBoxes();
+            };
+            setTimeout(renderOverlayBoxes, 100); // re-render overlay after image loads
+            checkReadyState();
         };
-        setTimeout(renderOverlayBoxes, 100); // re-render overlay after image loads
-        checkReadyState();
+        reader.readAsDataURL(file);
+    }
+}
+
+function handlePDFFile(file) {
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+        const typedarray = new Uint8Array(e.target.result);
+        
+        try {
+            // Load PDF document
+            const loadingTask = pdfjsLib.getDocument({data: typedarray});
+            const pdf = await loadingTask.promise;
+            
+            // Create container for PDF pages
+            const pdfContainer = document.createElement('div');
+            pdfContainer.className = 'pdf-preview';
+            pdfContainer.id = 'pdfContainer';
+            
+            // Render first page (you can modify to show multiple pages)
+            const page = await pdf.getPage(1);
+            
+            // Use higher scale for better resolution (3.0 = 3x resolution)
+            const scale = 3.0;
+            const viewport = page.getViewport({scale: scale});
+            
+            // Create canvas for the page
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+            
+            // Render PDF page to canvas
+            const renderContext = {
+                canvasContext: context,
+                viewport: viewport
+            };
+            
+            await page.render(renderContext).promise;
+            
+            // Add canvas to container
+            const pageDiv = document.createElement('div');
+            pageDiv.className = 'pdf-page';
+            pageDiv.appendChild(canvas);
+            pdfContainer.appendChild(pageDiv);
+            
+            // Add overlay boxes container
+            const overlayBoxes = document.createElement('div');
+            overlayBoxes.className = 'overlay-boxes';
+            overlayBoxes.id = 'overlayBoxes';
+            pdfContainer.appendChild(overlayBoxes);
+            
+            // Set template preview content
+            templatePreview.innerHTML = '';
+            templatePreview.appendChild(pdfContainer);
+            
+            // Set natural dimensions
+            templateNaturalWidth = viewport.width;
+            templateNaturalHeight = viewport.height;
+            
+            // Store PDF info for later use
+            templateFile.pdfDocument = pdf;
+            templateFile.pdfPage = page;
+            
+            setTimeout(renderOverlayBoxes, 100);
+            checkReadyState();
+            
+        } catch (error) {
+            console.error('Error loading PDF:', error);
+            alert('Error loading PDF file. Please try again.');
+        }
     };
-    reader.readAsDataURL(file);
+    reader.readAsArrayBuffer(file);
 }
 
 function getTemplateScale() {
     const img = document.getElementById('templateImg');
-    if (!img) return { scaleX: 1, scaleY: 1 };
-    const displayedWidth = img.width;
-    const displayedHeight = img.height;
-    return {
-        scaleX: templateNaturalWidth / displayedWidth,
-        scaleY: templateNaturalHeight / displayedHeight
-    };
+    const pdfContainer = document.getElementById('pdfContainer');
+    
+    if (img) {
+        // Image template
+        const displayedWidth = img.width;
+        const displayedHeight = img.height;
+        return {
+            scaleX: templateNaturalWidth / displayedWidth,
+            scaleY: templateNaturalHeight / displayedHeight
+        };
+    } else if (pdfContainer) {
+        // PDF template
+        const canvas = pdfContainer.querySelector('canvas');
+        if (canvas) {
+            const displayedWidth = canvas.offsetWidth;
+            const displayedHeight = canvas.offsetHeight;
+            return {
+                scaleX: templateNaturalWidth / displayedWidth,
+                scaleY: templateNaturalHeight / displayedHeight
+            };
+        }
+    }
+    
+    return { scaleX: 1, scaleY: 1 };
 }
 
 function handleCSVUpload(e) {
@@ -760,11 +965,15 @@ if (fieldSelect && addTextBoxBtn && addImageBoxBtn) {
     });
 }
 
-// Enable/disable Download All button
+// Enable/disable Download buttons
 function checkReadyState() {
-    downloadBtn.disabled = !(templateFile && csvData && boxes.length > 0);
+    const isReady = templateFile && csvData && boxes.length > 0;
+    downloadBtn.disabled = !isReady;
+    downloadPdfBtn.disabled = !isReady;
     const downloadAllBtn = document.getElementById('downloadAllBtn');
-    if (downloadAllBtn) downloadAllBtn.disabled = !(templateFile && csvData && boxes.length > 0);
+    if (downloadAllBtn) downloadAllBtn.disabled = !isReady;
+    const downloadAllPdfsBtn = document.getElementById('downloadAllPdfsBtn');
+    if (downloadAllPdfsBtn) downloadAllPdfsBtn.disabled = !isReady;
 }
 
 // Download All Images logic
@@ -853,6 +1062,161 @@ if (downloadAllBtn) {
         URL.revokeObjectURL(url);
         downloadAllBtn.disabled = false;
         downloadAllBtn.innerHTML = '<i class="fas fa-file-archive"></i> Download All Images';
+    });
+}
+
+// Download All PDFs logic
+const downloadAllPdfsBtn = document.getElementById('downloadAllPdfsBtn');
+if (downloadAllPdfsBtn) {
+    downloadAllPdfsBtn.addEventListener('click', async function() {
+        if (!templateFile || !csvData || boxes.length === 0) return;
+        downloadAllPdfsBtn.disabled = true;
+        downloadAllPdfsBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating PDFs...';
+        
+        const JSZipScript = document.getElementById('jszip-cdn');
+        if (!window.JSZip && !JSZipScript) {
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+            script.id = 'jszip-cdn';
+            document.body.appendChild(script);
+            await new Promise(res => { script.onload = res; });
+        } else if (!window.JSZip && JSZipScript) {
+            await new Promise(res => { JSZipScript.onload = res; });
+        }
+        
+        const zip = new JSZip();
+        const templatePreview = document.getElementById('templatePreview');
+        const img = document.getElementById('templateImg');
+        let scale = 2;
+        if (img && img.naturalWidth && img.width) {
+            scale = img.naturalWidth / img.width;
+        }
+        
+        isDownloadMode = true;
+        
+        try {
+            for (let i = 0; i < csvData.all_data.length; i++) {
+                currentRecord = i;
+                renderOverlayBoxes();
+                await new Promise(r => setTimeout(r, 50)); // let DOM update
+                
+                // Get current record data
+                const currentData = csvData.all_data[i];
+                if (!currentData) {
+                    console.warn(`No data available for record ${i + 1}`);
+                    continue;
+                }
+                
+                // Use the same html2canvas approach as image generation
+                const options = {
+                    scale: scale,
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: null,
+                    logging: false,
+                    onclone: (clonedDoc) => {
+                        const clonedPreview = clonedDoc.getElementById('templatePreview');
+                        if (clonedPreview) {
+                            const selectedBoxes = clonedPreview.querySelectorAll('.selected');
+                            selectedBoxes.forEach(box => box.classList.remove('selected'));
+                            const allBoxes = clonedPreview.querySelectorAll('.draggable-box');
+                            allBoxes.forEach(box => {
+                                box.style.border = 'none';
+                                box.style.background = 'transparent';
+                                box.style.boxShadow = 'none';
+                            });
+                        }
+                    }
+                };
+                
+                // Wait for all fonts and DOM to be ready (same as image generation)
+                await document.fonts.ready;
+                await new Promise(requestAnimationFrame);
+                const canvas = await html2canvas(templatePreview, options);
+                
+                // Crop to just the image area (same as image generation)
+                let cropX = 0, cropY = 0, cropW = canvas.width, cropH = canvas.height;
+                if (img) {
+                    const previewRect = templatePreview.getBoundingClientRect();
+                    const imgRect = img.getBoundingClientRect();
+                    cropX = Math.round((imgRect.left - previewRect.left) * scale);
+                    cropY = Math.round((imgRect.top - previewRect.top) * scale);
+                    cropW = Math.round(img.naturalWidth);
+                    cropH = Math.round(img.naturalHeight);
+                }
+                
+                const croppedCanvas = document.createElement('canvas');
+                croppedCanvas.width = cropW;
+                croppedCanvas.height = cropH;
+                const ctx = croppedCanvas.getContext('2d');
+                ctx.drawImage(canvas, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
+                
+                // Convert to image data
+                const imgData = croppedCanvas.toDataURL('image/jpeg', 0.9);
+                const imgElement = new Image();
+                imgElement.src = imgData;
+                
+                // Wait for image to load
+                await new Promise((resolve) => {
+                    imgElement.onload = resolve;
+                });
+                
+                // Create PDF
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                
+                // Get A4 dimensions in mm
+                const pageWidth = 210;
+                const pageHeight = 297;
+                
+                // Calculate image dimensions to fit on page
+                const imgAspectRatio = imgElement.width / imgElement.height;
+                const pageAspectRatio = pageWidth / pageHeight;
+                
+                let imgWidth, imgHeight;
+                if (imgAspectRatio > pageAspectRatio) {
+                    imgWidth = pageWidth;
+                    imgHeight = pageWidth / imgAspectRatio;
+                } else {
+                    imgHeight = pageHeight;
+                    imgWidth = pageHeight * imgAspectRatio;
+                }
+                
+                // Center image on page
+                const x = (pageWidth - imgWidth) / 2;
+                const y = (pageHeight - imgHeight) / 2;
+                
+                // Add image to PDF (this now includes the text overlays)
+                pdf.addImage(imgData, 'JPEG', x, y, imgWidth, imgHeight);
+                
+                // Generate PDF blob
+                const pdfBlob = pdf.output('blob');
+                zip.file(`pdf_${i+1}.pdf`, pdfBlob);
+            }
+            
+            // Generate and download zip
+            const content = await zip.generateAsync({type: 'blob'});
+            const url = URL.createObjectURL(content);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'pdfs.zip';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+        } catch (error) {
+            console.error('Error generating PDFs:', error);
+            alert('Error generating PDFs. Please try again.');
+        } finally {
+            isDownloadMode = false;
+            // Restore current record
+            currentRecord = 0;
+            renderOverlayBoxes();
+            renderRecordNavigation();
+            downloadAllPdfsBtn.disabled = false;
+            downloadAllPdfsBtn.innerHTML = '<i class="fas fa-file-pdf"></i> Download All PDFs';
+        }
     });
 }
 

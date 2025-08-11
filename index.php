@@ -14,26 +14,7 @@ session_start();
             background: #f6f8fa;
             min-height: 100vh;
         }
-        .navbar {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid #e2e8f0;
-            padding: 1rem 0;
-        }
-        .navbar-brand {
-            font-weight: 700;
-            font-size: 1.5rem;
-            color: #2563eb !important;
-        }
-        .navbar-nav .nav-link {
-            font-weight: 500;
-            color: #1e293b !important;
-            margin: 0 0.5rem;
-            transition: color 0.3s ease;
-        }
-        .navbar-nav .nav-link:hover {
-            color: #2563eb !important;
-        }
+
         .main-container {
             max-width: 1500px;
             margin: 40px auto;
@@ -162,6 +143,30 @@ session_start();
             height: auto;
             border-radius: 6px;
         }
+        
+        /* PDF Preview Styles */
+        .pdf-preview {
+            width: 100%;
+            height: auto;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .pdf-page {
+            margin-bottom: 10px;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .pdf-page canvas {
+            width: 100%;
+            height: auto;
+            display: block;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+        }
         @media (max-width: 1200px) {
             .main-container {
                 max-width: 100vw;
@@ -193,42 +198,7 @@ session_start();
     </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg">
-        <div class="container">
-            <a class="navbar-brand" href="/">
-                <i class="fas fa-layer-group me-2"></i>Font Merge
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/services">Services</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/about">About</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="https://fontmerge.online/blog/">Blog</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/contact">Contact</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/privacy">Privacy</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link btn btn-primary text-white px-3 ms-2 active" href="/app">App</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+
 
     <div class="main-container">
         <!-- Sidebar Controls -->
@@ -244,7 +214,8 @@ session_start();
             </div>
             <div>
                 <label for="templateInput">1. Upload Template</label>
-                <input type="file" id="templateInput" accept="image/*" class="form-control">
+                <input type="file" id="templateInput" accept="image/*,.pdf" class="form-control">
+                <small class="text-muted">Supports images (JPG, PNG, GIF) and PDF files</small>
             </div>
             <div>
                 <label for="csvInput">2. Upload Data (CSV/Excel)</label>
@@ -274,7 +245,9 @@ session_start();
                         <div class="accordion-body">
                             <label>Generate & Download</label>
                             <button class="btn btn-primary" id="downloadBtn" disabled><i class="fas fa-download"></i> Download Current Image</button>
+                            <button class="btn btn-info" id="downloadPdfBtn" disabled><i class="fas fa-file-pdf"></i> Download as PDF</button>
                             <button class="btn btn-success" id="downloadAllBtn" disabled><i class="fas fa-file-archive"></i> Download All Images</button>
+                            <button class="btn btn-warning" id="downloadAllPdfsBtn" disabled><i class="fas fa-file-pdf"></i> Download All PDFs</button>
                         </div>
                     </div>
                 </div>
@@ -301,6 +274,8 @@ session_start();
     <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" id="jszip-cdn"></script>
-    <script src="js/app.js"></script>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+                <script src="app.js"></script>
 </body>
 </html> 
