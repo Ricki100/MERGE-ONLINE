@@ -183,7 +183,7 @@ const downloadPdfBtn = document.getElementById('downloadPdfBtn');
 const previewsContainer = document.getElementById('previewsContainer');
 const fieldSelect = document.getElementById('fieldSelect');
 const addTextBoxBtn = document.getElementById('addTextBoxBtn');
-const addImageBoxBtn = document.getElementById('addImageBoxBtn');
+// const addImageBoxBtn = document.getElementById('addImageBoxBtn'); // Removed - no longer needed
 const fontPreviewContainer = document.getElementById('fontPreviewContainer');
 const fontPreviewBox = document.getElementById('fontPreviewBox');
 
@@ -206,19 +206,33 @@ downloadBtn.addEventListener('click', async function() {
         renderOverlayBoxes();
         const templatePreview = document.getElementById('templatePreview');
         const img = document.getElementById('templateImg');
-        let scale = 1;
+        let scale = 2; // Start with higher base scale for better quality
         if (img && img.naturalWidth && img.width) {
             scale = Math.max(img.naturalWidth / img.width, img.naturalHeight / img.height);
+            // Ensure minimum scale for high resolution, especially on mobile
+            scale = Math.max(scale, 2);
         }
+        
+        // Mobile-specific optimizations for higher quality
+        const isMobile = window.innerWidth <= 900;
+        const mobileScale = isMobile ? 1.5 : 1; // Boost scale on mobile
+        
         const options = {
-            scale: scale,
+            scale: scale * mobileScale,
             useCORS: true,
             allowTaint: true,
-            backgroundColor: null,
+            backgroundColor: '#ffffff', // Ensure white background
             logging: false,
             onclone: (clonedDoc) => {
                 const clonedPreview = clonedDoc.getElementById('templatePreview');
                 if (clonedPreview) {
+                    // Hide ALL editor interface elements
+                    const editorElements = clonedPreview.querySelectorAll('.editor-status, .grid-toggle, .placement-mode, .overlay-boxes, .template-preview-box');
+                    editorElements.forEach(el => {
+                        if (el !== clonedPreview) el.style.display = 'none';
+                    });
+                    
+                    // Clean up text boxes
                     const selectedBoxes = clonedPreview.querySelectorAll('.selected');
                     selectedBoxes.forEach(box => box.classList.remove('selected'));
                     const allBoxes = clonedPreview.querySelectorAll('.draggable-box');
@@ -227,26 +241,77 @@ downloadBtn.addEventListener('click', async function() {
                         box.style.background = 'transparent';
                         box.style.boxShadow = 'none';
                     });
+                    
+                    // Ensure clean background and remove any padding/margins
+                    clonedPreview.style.background = '#ffffff';
+                    clonedPreview.style.padding = '0';
+                    clonedPreview.style.margin = '0';
+                    clonedPreview.style.border = 'none';
+                    
+                    // Hide any preview container elements that might add grey areas
+                    const previewContainer = clonedDoc.getElementById('previewsContainer');
+                    if (previewContainer) previewContainer.style.display = 'none';
                 }
             }
         };
         // Wait for all fonts and DOM to be ready
         await document.fonts.ready;
         await new Promise(requestAnimationFrame);
-        const canvas = await html2canvas(templatePreview, options);
+        
+        // Try to capture just the image element directly if possible
+        let canvas;
+        if (img && img.complete) {
+            try {
+                // Capture only the image element to avoid any container elements
+                canvas = await html2canvas(img, {
+                    scale: scale * mobileScale,
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: '#ffffff',
+                    logging: false
+                });
+            } catch (error) {
+                console.log('Direct image capture failed, using preview container');
+                canvas = await html2canvas(templatePreview, options);
+            }
+        } else {
+            canvas = await html2canvas(templatePreview, options);
+        }
         let cropX = 0, cropY = 0, cropW = canvas.width, cropH = canvas.height;
         if (img) {
             const previewRect = templatePreview.getBoundingClientRect();
             const imgRect = img.getBoundingClientRect();
-            cropX = Math.round((imgRect.left - previewRect.left) * scale);
-            cropY = Math.round((imgRect.top - previewRect.top) * scale);
+            const actualScale = scale * mobileScale;
+            
+            // Ultra-precise cropping to avoid ANY editor elements
+            cropX = Math.round((imgRect.left - previewRect.left) * actualScale);
+            cropY = Math.round((imgRect.top - previewRect.top) * actualScale);
+            
+            // Use exact image dimensions to avoid any extra space
             cropW = Math.round(img.naturalWidth);
             cropH = Math.round(img.naturalHeight);
+            
+            // Add small buffer to ensure we don't capture interface elements
+            const buffer = 2; // 2 pixel buffer
+            cropX = Math.max(buffer, cropX);
+            cropY = Math.max(buffer, cropY);
+            cropW = Math.min(cropW - buffer, canvas.width - cropX - buffer);
+            cropH = Math.min(cropH - buffer, canvas.height - cropY - buffer);
+            
+            // Ensure positive dimensions
+            cropW = Math.max(1, cropW);
+            cropH = Math.max(1, cropH);
         }
         const croppedCanvas = document.createElement('canvas');
         croppedCanvas.width = cropW;
         croppedCanvas.height = cropH;
         const ctx = croppedCanvas.getContext('2d');
+        
+        // Fill with white background first
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, cropW, cropH);
+        
+        // Then draw the image
         ctx.drawImage(canvas, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
         croppedCanvas.toBlob((blob) => {
             const url = URL.createObjectURL(blob);
@@ -285,6 +350,8 @@ downloadPdfBtn.addEventListener('click', async function() {
         let scale = 2;
         if (img && img.naturalWidth && img.width) {
             scale = img.naturalWidth / img.width;
+            // Ensure minimum scale for high resolution, especially on mobile
+            scale = Math.max(scale, 2);
         }
         
         // Use the same html2canvas approach as image generation
@@ -416,13 +483,25 @@ function handlePDFFile(file) {
             const loadingTask = pdfjsLib.getDocument({data: typedarray});
             const pdf = await loadingTask.promise;
             
+            // Render first page (you can modify to show multiple pages)
+            const page = await pdf.getPage(1);
+            
+            // Get PDF viewport at scale 1.0 to get original dimensions
+            const baseViewport = page.getViewport({scale: 1.0});
+            
             // Create container for PDF pages
             const pdfContainer = document.createElement('div');
             pdfContainer.className = 'pdf-preview';
             pdfContainer.id = 'pdfContainer';
             
-            // Render first page (you can modify to show multiple pages)
-            const page = await pdf.getPage(1);
+            // Make PDF container match PDF dimensions exactly
+            pdfContainer.style.width = baseViewport.width + 'px';
+            pdfContainer.style.height = baseViewport.height + 'px';
+            pdfContainer.style.background = 'transparent';
+            pdfContainer.style.padding = '0';
+            pdfContainer.style.margin = '0';
+            pdfContainer.style.border = 'none';
+            pdfContainer.style.borderRadius = '0';
             
             // Use higher scale for better resolution (3.0 = 3x resolution)
             const scale = 3.0;
@@ -458,9 +537,20 @@ function handlePDFFile(file) {
             templatePreview.innerHTML = '';
             templatePreview.appendChild(pdfContainer);
             
-            // Set natural dimensions
-            templateNaturalWidth = viewport.width;
-            templateNaturalHeight = viewport.height;
+            // Make template preview container match PDF dimensions exactly
+            templatePreview.style.width = baseViewport.width + 'px';
+            templatePreview.style.height = baseViewport.height + 'px';
+            templatePreview.style.maxWidth = 'none';
+            templatePreview.style.maxHeight = 'none';
+            templatePreview.style.background = 'transparent';
+            templatePreview.style.padding = '0';
+            templatePreview.style.margin = '0';
+            templatePreview.style.border = 'none';
+            templatePreview.style.borderRadius = '0';
+            
+            // Store PDF dimensions for cropping
+            templateNaturalWidth = baseViewport.width;
+            templateNaturalHeight = baseViewport.height;
             
             // Store PDF info for later use
             templateFile.pdfDocument = pdf;
@@ -471,7 +561,13 @@ function handlePDFFile(file) {
             
         } catch (error) {
             console.error('Error loading PDF:', error);
-            alert('Error loading PDF file. Please try again.');
+            alert('Error loading PDF file. Please try again.\n\nError details: ' + error.message);
+            
+            // Reset the file input
+            const templateInput = document.getElementById('templateInput');
+            if (templateInput) {
+                templateInput.value = '';
+            }
         }
     };
     reader.readAsArrayBuffer(file);
@@ -606,7 +702,7 @@ function renderBox(box) {
                 <div class="col-md-6 mb-2">
                     <label class="form-label">Color</label>
                     <input type="color" class="form-control" value="${box.color}"
-                           onchange="updateBox(${box.id}, 'color', this.value)">
+                           oninput="updateBox(${box.id}, 'color', this.value)">
                 </div>
                 <div class="col-md-12 mb-2">
                     <div class="form-check form-check-inline">
@@ -1019,59 +1115,61 @@ function renderBoxEditor() {
                 <div class="col-md-6 mb-2">
                     <label class="form-label">Color</label>
                     <input type="color" class="form-control" value="${box.color}"
-                           onchange="updateBox(${box.id}, 'color', this.value)">
+                           oninput="updateBox(${box.id}, 'color', this.value)">
                 </div>
                 <div class="col-md-12 mb-2">
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" ${box.bold ? 'checked' : ''}
-                               onchange="updateBox(${box.id}, 'bold', this.checked)">
-                        <label class="form-check-label">Bold</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" ${box.italic ? 'checked' : ''}
-                               onchange="updateBox(${box.id}, 'italic', this.checked)">
-                        <label class="form-check-label">Italic</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" ${box.underline ? 'checked' : ''}
-                               onchange="updateBox(${box.id}, 'underline', this.checked)">
-                        <label class="form-check-label">Underline</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" ${box.strikethrough ? 'checked' : ''}
-                               onchange="updateBox(${box.id}, 'strikethrough', this.checked)">
-                        <label class="form-check-label">Strikethrough</label>
+                    <label class="form-label">Font Style</label>
+                    <div class="d-flex flex-wrap">
+                        <div class="tooltip-icon">
+                            <button class="icon-btn ${box.bold ? 'active' : ''}" onclick="updateBox(${box.id}, 'bold', !${box.bold})">
+                                <i class="fas fa-bold"></i>
+                            </button>
+                            <span class="tooltip-text">Bold</span>
+                        </div>
+                        <div class="tooltip-icon">
+                            <button class="icon-btn ${box.italic ? 'active' : ''}" onclick="updateBox(${box.id}, 'italic', !${box.italic})">
+                                <i class="fas fa-italic"></i>
+                            </button>
+                            <span class="tooltip-text">Italic</span>
+                        </div>
+                        <div class="tooltip-icon">
+                            <button class="icon-btn ${box.underline ? 'active' : ''}" onclick="updateBox(${box.id}, 'underline', !${box.underline})">
+                                <i class="fas fa-underline"></i>
+                            </button>
+                            <span class="tooltip-text">Underline</span>
+                        </div>
+                        <div class="tooltip-icon">
+                            <button class="icon-btn ${box.strikethrough ? 'active' : ''}" onclick="updateBox(${box.id}, 'strikethrough', !${box.strikethrough})">
+                                <i class="fas fa-strikethrough"></i>
+                            </button>
+                            <span class="tooltip-text">Strikethrough</span>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-6 mb-2">
+                <div class="col-md-12 mb-2">
                     <label class="form-label">Text Alignment</label>
-                    <select class="form-select" onchange="updateBox(${box.id}, 'align', this.value)">
-                        <option value="left" ${box.align === 'left' ? 'selected' : ''}>Left</option>
-                        <option value="center" ${box.align === 'center' ? 'selected' : ''}>Center</option>
-                        <option value="right" ${box.align === 'right' ? 'selected' : ''}>Right</option>
-                    </select>
+                    <div class="d-flex flex-wrap">
+                        <div class="tooltip-icon">
+                            <button class="icon-btn ${box.align === 'left' ? 'active' : ''}" onclick="updateBox(${box.id}, 'align', 'left')">
+                                <i class="fas fa-align-left"></i>
+                            </button>
+                            <span class="tooltip-text">Align Left</span>
+                        </div>
+                        <div class="tooltip-icon">
+                            <button class="icon-btn ${box.align === 'center' ? 'active' : ''}" onclick="updateBox(${box.id}, 'align', 'center')">
+                                <i class="fas fa-align-center"></i>
+                            </button>
+                            <span class="tooltip-text">Align Center</span>
+                        </div>
+                        <div class="tooltip-icon">
+                            <button class="icon-btn ${box.align === 'right' ? 'active' : ''}" onclick="updateBox(${box.id}, 'align', 'right')">
+                                <i class="fas fa-align-right"></i>
+                            </button>
+                            <span class="tooltip-text">Align Right</span>
+                        </div>
+                    </div>
                 </div>
             ` : ''}
-            <div class="col-md-6 mb-2">
-                <label class="form-label">X Position</label>
-                <input type="number" class="form-control" value="${box.x}"
-                       onchange="updateBox(${box.id}, 'x', this.value)">
-            </div>
-            <div class="col-md-6 mb-2">
-                <label class="form-label">Y Position</label>
-                <input type="number" class="form-control" value="${box.y}"
-                       onchange="updateBox(${box.id}, 'y', this.value)">
-            </div>
-            <div class="col-md-6 mb-2">
-                <label class="form-label">Width</label>
-                <input type="number" class="form-control" value="${box.width}"
-                       onchange="updateBox(${box.id}, 'width', this.value)">
-            </div>
-            <div class="col-md-6 mb-2">
-                <label class="form-label">Height</label>
-                <input type="number" class="form-control" value="${box.height}"
-                       onchange="updateBox(${box.id}, 'height', this.value)">
-            </div>
         </div>
     `;
     boxesContainer.appendChild(boxElement);
@@ -1091,25 +1189,16 @@ function populateFieldDropdown() {
     fieldSelect.disabled = false;
 }
 
-if (fieldSelect && addTextBoxBtn && addImageBoxBtn) {
+if (fieldSelect && addTextBoxBtn) {
     fieldSelect.addEventListener('change', function() {
         const enabled = !!fieldSelect.value;
         addTextBoxBtn.disabled = !enabled;
-        addImageBoxBtn.disabled = !enabled;
     });
     addTextBoxBtn.addEventListener('click', function() {
         if (!fieldSelect.value) return;
         addBoxAt('text', 50, 50, fieldSelect.value);
         fieldSelect.value = '';
         addTextBoxBtn.disabled = true;
-        addImageBoxBtn.disabled = true;
-    });
-    addImageBoxBtn.addEventListener('click', function() {
-        if (!fieldSelect.value) return;
-        addBoxAt('image', 50, 50, fieldSelect.value);
-        fieldSelect.value = '';
-        addTextBoxBtn.disabled = true;
-        addImageBoxBtn.disabled = true;
     });
 }
 
@@ -1147,6 +1236,8 @@ if (downloadAllBtn) {
         let scale = 2;
         if (img && img.naturalWidth && img.width) {
             scale = img.naturalWidth / img.width;
+            // Ensure minimum scale for high resolution, especially on mobile
+            scale = Math.max(scale, 2);
         }
         isDownloadMode = true;
         for (let i = 0; i < csvData.all_data.length; i++) {
@@ -1241,6 +1332,8 @@ if (downloadAllPdfsBtn) {
         let scale = 2;
         if (img && img.naturalWidth && img.width) {
             scale = img.naturalWidth / img.width;
+            // Ensure minimum scale for high resolution, especially on mobile
+            scale = Math.max(scale, 2);
         }
         
         isDownloadMode = true;
