@@ -61,8 +61,6 @@ session_start();
         }
         .template-preview-box {
             background: #f3f4f6;
-            border: 2px dashed #cbd5e1;
-            border-radius: 16px;
             width: 100%;
             max-width: 900px;
             min-height: 650px;
@@ -77,7 +75,6 @@ session_start();
             max-width: 100%;
             max-height: 800px;
             object-fit: contain;
-            border-radius: 12px;
             display: block;
         }
         .overlay-boxes {

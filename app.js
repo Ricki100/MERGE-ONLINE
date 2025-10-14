@@ -13,6 +13,159 @@ let defaultFontFamily = 'Arial';
 // Font loading cache
 const loadedFonts = {};
 
+// Smart JPEG quality optimization for target file size (1MB-1.5MB)
+async function optimizeImageQuality(canvas, targetSizeBytes = 1.25 * 1024 * 1024) { // 1.25MB target
+    const maxIterations = 10;
+    let quality = 0.95; // Start with high quality
+    let minQuality = 0.7; // Minimum acceptable quality
+    let bestQuality = quality;
+    let bestSize = 0;
+    
+    for (let i = 0; i < maxIterations; i++) {
+        const testDataUrl = canvas.toDataURL('image/jpeg', quality);
+        const sizeBytes = (testDataUrl.length - 22) * 3 / 4; // Approximate byte size
+        
+        // Check if size is within target range (1MB-1.5MB)
+        if (sizeBytes >= 1024 * 1024 && sizeBytes <= 1.5 * 1024 * 1024) {
+            return { dataUrl: testDataUrl, quality: quality, size: sizeBytes };
+        }
+        
+        // If too large, reduce quality
+        if (sizeBytes > 1.5 * 1024 * 1024) {
+            quality = Math.max(quality - 0.05, minQuality);
+        }
+        // If too small, increase quality (but don't exceed 0.95)
+        else if (sizeBytes < 1024 * 1024) {
+            quality = Math.min(quality + 0.02, 0.95);
+        }
+        
+        // Track best quality within acceptable range
+        if (sizeBytes <= 1.5 * 1024 * 1024 && quality > bestQuality) {
+            bestQuality = quality;
+            bestSize = sizeBytes;
+        }
+        
+        // If we've hit minimum quality, use the best we found
+        if (quality <= minQuality) {
+            const finalDataUrl = canvas.toDataURL('image/jpeg', bestQuality);
+            return { dataUrl: finalDataUrl, quality: bestQuality, size: bestSize };
+        }
+    }
+    
+    // Fallback to best quality found
+    const finalDataUrl = canvas.toDataURL('image/jpeg', bestQuality);
+    return { dataUrl: finalDataUrl, quality: bestQuality, size: bestSize };
+}
+
+// PDF Conversion Dialogue
+function showPdfConversionDialog() {
+    const modal = document.createElement('div');
+    modal.className = 'modal fade';
+    modal.id = 'pdfConversionModal';
+    modal.setAttribute('tabindex', '-1');
+    modal.setAttribute('aria-labelledby', 'pdfConversionModalLabel');
+    modal.setAttribute('aria-hidden', 'true');
+    
+    modal.innerHTML = `
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="pdfConversionModalLabel">
+                        <i class="fas fa-file-pdf text-danger"></i> Convert to PDF?
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Would you like to convert the processed image to PDF format?</p>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> PDF format is ideal for printing and sharing documents.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, keep as image</button>
+                    <button type="button" class="btn btn-primary" id="convertToPdfBtn">
+                        <i class="fas fa-file-pdf"></i> Yes, convert to PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Show the modal
+    const bsModal = new bootstrap.Modal(modal);
+    bsModal.show();
+    
+    // Handle conversion
+    document.getElementById('convertToPdfBtn').addEventListener('click', function() {
+        bsModal.hide();
+        // Trigger PDF download
+        downloadPdfBtn.click();
+    });
+    
+    // Clean up modal when hidden
+    modal.addEventListener('hidden.bs.modal', function() {
+        document.body.removeChild(modal);
+    });
+}
+
+// PDF Conversion Dialogue for All Images
+function showPdfConversionDialogForAll() {
+    const modal = document.createElement('div');
+    modal.className = 'modal fade';
+    modal.id = 'pdfConversionAllModal';
+    modal.setAttribute('tabindex', '-1');
+    modal.setAttribute('aria-labelledby', 'pdfConversionAllModalLabel');
+    modal.setAttribute('aria-hidden', 'true');
+    
+    modal.innerHTML = `
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="pdfConversionAllModalLabel">
+                        <i class="fas fa-file-pdf text-danger"></i> Convert All to PDFs?
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Would you like to convert all processed images to PDF format?</p>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> This will generate a ZIP file containing PDF versions of all your images.
+                    </div>
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i> This may take a moment depending on the number of records.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, keep as images</button>
+                    <button type="button" class="btn btn-primary" id="convertAllToPdfBtn">
+                        <i class="fas fa-file-pdf"></i> Yes, convert all to PDFs
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Show the modal
+    const bsModal = new bootstrap.Modal(modal);
+    bsModal.show();
+    
+    // Handle conversion
+    document.getElementById('convertAllToPdfBtn').addEventListener('click', function() {
+        bsModal.hide();
+        // Trigger PDF download for all
+        downloadAllPdfsBtn.click();
+    });
+    
+    // Clean up modal when hidden
+    modal.addEventListener('hidden.bs.modal', function() {
+        document.body.removeChild(modal);
+    });
+}
+
 const SUPPORTED_FONTS = [
   { name: 'Arial', google: false },
   { name: 'Times New Roman', google: false }
@@ -104,7 +257,7 @@ downloadBtn.addEventListener('click', async function() {
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-        }, 'image/jpeg', 0.85);
+        }, 'image/jpeg', 0.95);
     } catch (error) {
         console.error('Error capturing image:', error);
         alert('Error capturing image. Please try again.');
@@ -113,6 +266,9 @@ downloadBtn.addEventListener('click', async function() {
         renderOverlayBoxes();
         downloadBtn.disabled = false;
         downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download Current Image';
+        
+        // Show PDF conversion dialogue
+        showPdfConversionDialog();
     }
 });
 
@@ -175,8 +331,10 @@ downloadPdfBtn.addEventListener('click', async function() {
         const ctx = croppedCanvas.getContext('2d');
         ctx.drawImage(canvas, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
         
-        // Convert to image data
-        const imgData = croppedCanvas.toDataURL('image/jpeg', 0.9);
+        // Optimize image quality for target file size (1MB-1.5MB)
+        const optimizedImage = await optimizeImageQuality(croppedCanvas);
+        const imgData = optimizedImage.dataUrl;
+        console.log(`PDF Image optimized: Quality ${(optimizedImage.quality * 100).toFixed(1)}%, Size ${(optimizedImage.size / 1024 / 1024).toFixed(2)}MB`);
         const imgElement = new Image();
         imgElement.src = imgData;
 
@@ -185,33 +343,23 @@ downloadPdfBtn.addEventListener('click', async function() {
             imgElement.onload = resolve;
         });
 
-        // Create PDF
+        // Create PDF with exact image dimensions
         const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('p', 'mm', 'a4');
         
-        // Get A4 dimensions in mm
-        const pageWidth = 210;
-        const pageHeight = 297;
+        // Convert pixels to mm (1 inch = 25.4mm, 1 inch = 96 pixels typically)
+        const pixelsToMm = 25.4 / 96;
+        const imgWidthMm = imgElement.width * pixelsToMm;
+        const imgHeightMm = imgElement.height * pixelsToMm;
         
-        // Calculate image dimensions to fit on page
-        const imgAspectRatio = imgElement.width / imgElement.height;
-        const pageAspectRatio = pageWidth / pageHeight;
+        // Create PDF with exact image dimensions
+        const pdf = new jsPDF({
+            orientation: imgWidthMm > imgHeightMm ? 'landscape' : 'portrait',
+            unit: 'mm',
+            format: [imgWidthMm, imgHeightMm]
+        });
         
-        let imgWidth, imgHeight;
-        if (imgAspectRatio > pageAspectRatio) {
-            imgWidth = pageWidth;
-            imgHeight = pageWidth / imgAspectRatio;
-        } else {
-            imgHeight = pageHeight;
-            imgWidth = pageHeight * imgAspectRatio;
-        }
-        
-        // Center image on page
-        const x = (pageWidth - imgWidth) / 2;
-        const y = (pageHeight - imgHeight) / 2;
-        
-        // Add image to PDF (this now includes the text overlays)
-        pdf.addImage(imgData, 'JPEG', x, y, imgWidth, imgHeight);
+        // Add image to PDF at full size (0,0 position, full dimensions)
+        pdf.addImage(imgData, 'JPEG', 0, 0, imgWidthMm, imgHeightMm);
         
         // Save PDF
         pdf.save(`template_${currentRecord + 1}.pdf`);
@@ -1043,7 +1191,7 @@ if (downloadAllBtn) {
             croppedCanvas.height = cropH;
             const ctx = croppedCanvas.getContext('2d');
             ctx.drawImage(canvas, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
-            const blob = await new Promise(res => croppedCanvas.toBlob(res, 'image/jpeg', 0.85));
+            const blob = await new Promise(res => croppedCanvas.toBlob(res, 'image/jpeg', 0.95));
             zip.file(`image_${i+1}.jpg`, blob);
         }
         isDownloadMode = false;
@@ -1062,6 +1210,9 @@ if (downloadAllBtn) {
         URL.revokeObjectURL(url);
         downloadAllBtn.disabled = false;
         downloadAllBtn.innerHTML = '<i class="fas fa-file-archive"></i> Download All Images';
+        
+        // Show PDF conversion dialogue for all images
+        showPdfConversionDialogForAll();
     });
 }
 
@@ -1151,8 +1302,10 @@ if (downloadAllPdfsBtn) {
                 const ctx = croppedCanvas.getContext('2d');
                 ctx.drawImage(canvas, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
                 
-                // Convert to image data
-                const imgData = croppedCanvas.toDataURL('image/jpeg', 0.9);
+                // Optimize image quality for target file size (1MB-1.5MB)
+                const optimizedImage = await optimizeImageQuality(croppedCanvas);
+                const imgData = optimizedImage.dataUrl;
+                console.log(`PDF ${i+1} optimized: Quality ${(optimizedImage.quality * 100).toFixed(1)}%, Size ${(optimizedImage.size / 1024 / 1024).toFixed(2)}MB`);
                 const imgElement = new Image();
                 imgElement.src = imgData;
                 
@@ -1161,33 +1314,23 @@ if (downloadAllPdfsBtn) {
                     imgElement.onload = resolve;
                 });
                 
-                // Create PDF
+                // Create PDF with exact image dimensions
                 const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('p', 'mm', 'a4');
                 
-                // Get A4 dimensions in mm
-                const pageWidth = 210;
-                const pageHeight = 297;
+                // Convert pixels to mm (1 inch = 25.4mm, 1 inch = 96 pixels typically)
+                const pixelsToMm = 25.4 / 96;
+                const imgWidthMm = imgElement.width * pixelsToMm;
+                const imgHeightMm = imgElement.height * pixelsToMm;
                 
-                // Calculate image dimensions to fit on page
-                const imgAspectRatio = imgElement.width / imgElement.height;
-                const pageAspectRatio = pageWidth / pageHeight;
+                // Create PDF with exact image dimensions
+                const pdf = new jsPDF({
+                    orientation: imgWidthMm > imgHeightMm ? 'landscape' : 'portrait',
+                    unit: 'mm',
+                    format: [imgWidthMm, imgHeightMm]
+                });
                 
-                let imgWidth, imgHeight;
-                if (imgAspectRatio > pageAspectRatio) {
-                    imgWidth = pageWidth;
-                    imgHeight = pageWidth / imgAspectRatio;
-                } else {
-                    imgHeight = pageHeight;
-                    imgWidth = pageHeight * imgAspectRatio;
-                }
-                
-                // Center image on page
-                const x = (pageWidth - imgWidth) / 2;
-                const y = (pageHeight - imgHeight) / 2;
-                
-                // Add image to PDF (this now includes the text overlays)
-                pdf.addImage(imgData, 'JPEG', x, y, imgWidth, imgHeight);
+                // Add image to PDF at full size (0,0 position, full dimensions)
+                pdf.addImage(imgData, 'JPEG', 0, 0, imgWidthMm, imgHeightMm);
                 
                 // Generate PDF blob
                 const pdfBlob = pdf.output('blob');
