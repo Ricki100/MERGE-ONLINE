@@ -1,37 +1,4 @@
-RewriteEngine On
-
-# Remove .php extension from URLs
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^([^\.]+)$ $1.php [NC,L]
-
-# Redirect /index.php to /
-RewriteRule ^index\.php$ / [R=301,L]
-
-# Redirect /app.php to /app
-RewriteRule ^app\.php$ /app [R=301,L]
-
-# Redirect /about.php to /about
-RewriteRule ^about\.php$ /about [R=301,L]
-
-# Redirect /services.php to /services
-RewriteRule ^services\.php$ /services [R=301,L]
-
-# Redirect /contact.php to /contact
-RewriteRule ^contact\.php$ /contact [R=301,L]
-
-# Redirect /privacy.php to /privacy
-RewriteRule ^privacy\.php$ /privacy [R=301,L]
-
-# Security headers
-<IfModule mod_headers.c>
-    Header always set X-Content-Type-Options nosniff
-    Header always set X-Frame-Options DENY
-    Header always set X-XSS-Protection "1; mode=block"
-    Header always set Referrer-Policy "strict-origin-when-cross-origin"
-</IfModule>
-
-# Enable compression
+# Enable GZIP Compression
 <IfModule mod_deflate.c>
     AddOutputFilterByType DEFLATE text/plain
     AddOutputFilterByType DEFLATE text/html
@@ -44,7 +11,7 @@ RewriteRule ^privacy\.php$ /privacy [R=301,L]
     AddOutputFilterByType DEFLATE application/x-javascript
 </IfModule>
 
-# Cache static files
+# Browser Caching
 <IfModule mod_expires.c>
     ExpiresActive on
     ExpiresByType text/css "access plus 1 year"
@@ -54,4 +21,39 @@ RewriteRule ^privacy\.php$ /privacy [R=301,L]
     ExpiresByType image/jpeg "access plus 1 year"
     ExpiresByType image/gif "access plus 1 year"
     ExpiresByType image/svg+xml "access plus 1 year"
-</IfModule> 
+    ExpiresByType application/pdf "access plus 1 year"
+    ExpiresByType text/html "access plus 1 day"
+</IfModule>
+
+# Security Headers
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options nosniff
+    Header always set X-Frame-Options DENY
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+</IfModule>
+
+# Force HTTPS
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{HTTPS} off
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+# Remove trailing slashes
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)/$ /$1 [R=301,L]
+</IfModule>
+
+# Custom Error Pages
+ErrorDocument 404 /404.html
+ErrorDocument 500 /500.html
+
+# Prevent access to sensitive files
+<FilesMatch "\.(htaccess|htpasswd|ini|log|sh|inc|bak)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>

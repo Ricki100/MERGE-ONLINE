@@ -13,6 +13,27 @@ let defaultFontFamily = 'Arial';
 // Font loading cache
 const loadedFonts = {};
 
+// High-resolution scaling for A4 PDFs
+function createHighResCanvas(originalCanvas, targetWidth, targetHeight) {
+    // Calculate scale factor for high resolution (300 DPI for print quality)
+    const printDPI = 300;
+    const screenDPI = 96;
+    const scaleFactor = printDPI / screenDPI;
+    
+    const highResCanvas = document.createElement('canvas');
+    highResCanvas.width = targetWidth * scaleFactor;
+    highResCanvas.height = targetHeight * scaleFactor;
+    
+    const ctx = highResCanvas.getContext('2d');
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    
+    // Draw the original canvas scaled up
+    ctx.drawImage(originalCanvas, 0, 0, highResCanvas.width, highResCanvas.height);
+    
+    return highResCanvas;
+}
+
 // Smart JPEG quality optimization for target file size (1MB-1.5MB)
 async function optimizeImageQuality(canvas, targetSizeBytes = 1.25 * 1024 * 1024) { // 1.25MB target
     const maxIterations = 10;
@@ -302,6 +323,18 @@ downloadBtn.addEventListener('click', async function() {
             cropW = Math.max(1, cropW);
             cropH = Math.max(1, cropH);
         }
+        
+        // A4 dimensions in mm for detection
+        const A4_WIDTH = 210;
+        const A4_HEIGHT = 297;
+        const pixelsToMm = 25.4 / 96;
+        const imgWidthMm = cropW * pixelsToMm;
+        const imgHeightMm = cropH * pixelsToMm;
+        const isA4Width = Math.abs(imgWidthMm - A4_WIDTH) / A4_WIDTH < 0.1;
+        const isA4Height = Math.abs(imgHeightMm - A4_HEIGHT) / A4_HEIGHT < 0.1;
+        const isA4Landscape = Math.abs(imgWidthMm - A4_HEIGHT) / A4_HEIGHT < 0.1 && Math.abs(imgHeightMm - A4_WIDTH) / A4_WIDTH < 0.1;
+        const isA4Document = (isA4Width && isA4Height) || isA4Landscape;
+        
         const croppedCanvas = document.createElement('canvas');
         croppedCanvas.width = cropW;
         croppedCanvas.height = cropH;
@@ -398,8 +431,10 @@ downloadPdfBtn.addEventListener('click', async function() {
         const ctx = croppedCanvas.getContext('2d');
         ctx.drawImage(canvas, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
         
+        let finalCanvas = croppedCanvas;
+        
         // Optimize image quality for target file size (1MB-1.5MB)
-        const optimizedImage = await optimizeImageQuality(croppedCanvas);
+        const optimizedImage = await optimizeImageQuality(finalCanvas);
         const imgData = optimizedImage.dataUrl;
         console.log(`PDF Image optimized: Quality ${(optimizedImage.quality * 100).toFixed(1)}%, Size ${(optimizedImage.size / 1024 / 1024).toFixed(2)}MB`);
         const imgElement = new Image();
@@ -410,23 +445,60 @@ downloadPdfBtn.addEventListener('click', async function() {
             imgElement.onload = resolve;
         });
 
-        // Create PDF with exact image dimensions
+        // Create PDF with A4 size standardization
         const { jsPDF } = window.jspdf;
         
-        // Convert pixels to mm (1 inch = 25.4mm, 1 inch = 96 pixels typically)
+        // A4 dimensions in mm for detection
+        const A4_WIDTH = 210;
+        const A4_HEIGHT = 297;
         const pixelsToMm = 25.4 / 96;
         const imgWidthMm = imgElement.width * pixelsToMm;
         const imgHeightMm = imgElement.height * pixelsToMm;
         
-        // Create PDF with exact image dimensions
+        // Check if the image is close to A4 size (within 10% tolerance)
+        const isA4Width = Math.abs(imgWidthMm - A4_WIDTH) / A4_WIDTH < 0.1;
+        const isA4Height = Math.abs(imgHeightMm - A4_HEIGHT) / A4_HEIGHT < 0.1;
+        const isA4Landscape = Math.abs(imgWidthMm - A4_HEIGHT) / A4_HEIGHT < 0.1 && Math.abs(imgHeightMm - A4_WIDTH) / A4_WIDTH < 0.1;
+        
+        let pdfWidth, pdfHeight, imageWidth, imageHeight;
+        
+        if (isA4Width && isA4Height) {
+            // Portrait A4
+            pdfWidth = A4_WIDTH;
+            pdfHeight = A4_HEIGHT;
+            imageWidth = A4_WIDTH;
+            imageHeight = A4_HEIGHT;
+        } else if (isA4Landscape) {
+            // Landscape A4
+            pdfWidth = A4_HEIGHT;
+            pdfHeight = A4_WIDTH;
+            imageWidth = A4_HEIGHT;
+            imageHeight = A4_WIDTH;
+        } else {
+            // Use original dimensions but ensure high quality
+            pdfWidth = imgWidthMm;
+            pdfHeight = imgHeightMm;
+            imageWidth = imgWidthMm;
+            imageHeight = imgHeightMm;
+        }
+        
+        // Create PDF with standardized dimensions
         const pdf = new jsPDF({
-            orientation: imgWidthMm > imgHeightMm ? 'landscape' : 'portrait',
+            orientation: pdfWidth > pdfHeight ? 'landscape' : 'portrait',
             unit: 'mm',
-            format: [imgWidthMm, imgHeightMm]
+            format: [pdfWidth, pdfHeight]
         });
         
-        // Add image to PDF at full size (0,0 position, full dimensions)
-        pdf.addImage(imgData, 'JPEG', 0, 0, imgWidthMm, imgHeightMm);
+        // For A4 documents, use high-resolution image
+        if ((isA4Width && isA4Height) || isA4Landscape) {
+            // Create high-resolution canvas for A4 documents (300 DPI)
+            const highResCanvas = createHighResCanvas(croppedCanvas, cropW, cropH);
+            const highResImgData = highResCanvas.toDataURL('image/jpeg', 0.95);
+            pdf.addImage(highResImgData, 'JPEG', 0, 0, imageWidth, imageHeight);
+            console.log(`A4 document detected - using high-resolution version (300 DPI)`);
+        } else {
+            pdf.addImage(imgData, 'JPEG', 0, 0, imageWidth, imageHeight);
+        }
         
         // Save PDF
         pdf.save(`template_${currentRecord + 1}.pdf`);
@@ -1407,23 +1479,62 @@ if (downloadAllPdfsBtn) {
                     imgElement.onload = resolve;
                 });
                 
-                // Create PDF with exact image dimensions
+                // Create PDF with A4 size standardization
                 const { jsPDF } = window.jspdf;
+                
+                // A4 dimensions in mm
+                const A4_WIDTH = 210;
+                const A4_HEIGHT = 297;
                 
                 // Convert pixels to mm (1 inch = 25.4mm, 1 inch = 96 pixels typically)
                 const pixelsToMm = 25.4 / 96;
                 const imgWidthMm = imgElement.width * pixelsToMm;
                 const imgHeightMm = imgElement.height * pixelsToMm;
                 
-                // Create PDF with exact image dimensions
+                // Check if the image is close to A4 size (within 10% tolerance)
+                const isA4Width = Math.abs(imgWidthMm - A4_WIDTH) / A4_WIDTH < 0.1;
+                const isA4Height = Math.abs(imgHeightMm - A4_HEIGHT) / A4_HEIGHT < 0.1;
+                const isA4Landscape = Math.abs(imgWidthMm - A4_HEIGHT) / A4_HEIGHT < 0.1 && Math.abs(imgHeightMm - A4_WIDTH) / A4_WIDTH < 0.1;
+                
+                let pdfWidth, pdfHeight, imageWidth, imageHeight;
+                
+                if (isA4Width && isA4Height) {
+                    // Portrait A4
+                    pdfWidth = A4_WIDTH;
+                    pdfHeight = A4_HEIGHT;
+                    imageWidth = A4_WIDTH;
+                    imageHeight = A4_HEIGHT;
+                } else if (isA4Landscape) {
+                    // Landscape A4
+                    pdfWidth = A4_HEIGHT;
+                    pdfHeight = A4_WIDTH;
+                    imageWidth = A4_HEIGHT;
+                    imageHeight = A4_WIDTH;
+                } else {
+                    // Use original dimensions but ensure high quality
+                    pdfWidth = imgWidthMm;
+                    pdfHeight = imgHeightMm;
+                    imageWidth = imgWidthMm;
+                    imageHeight = imgHeightMm;
+                }
+                
+                // Create PDF with standardized dimensions
                 const pdf = new jsPDF({
-                    orientation: imgWidthMm > imgHeightMm ? 'landscape' : 'portrait',
+                    orientation: pdfWidth > pdfHeight ? 'landscape' : 'portrait',
                     unit: 'mm',
-                    format: [imgWidthMm, imgHeightMm]
+                    format: [pdfWidth, pdfHeight]
                 });
                 
-                // Add image to PDF at full size (0,0 position, full dimensions)
-                pdf.addImage(imgData, 'JPEG', 0, 0, imgWidthMm, imgHeightMm);
+                // For A4 documents, use high-resolution image
+                if ((isA4Width && isA4Height) || isA4Landscape) {
+                    // Create high-resolution canvas for A4 documents (300 DPI)
+                    const highResCanvas = createHighResCanvas(croppedCanvas, cropW, cropH);
+                    const highResImgData = highResCanvas.toDataURL('image/jpeg', 0.95);
+                    pdf.addImage(highResImgData, 'JPEG', 0, 0, imageWidth, imageHeight);
+                    console.log(`PDF ${i+1}: A4 document detected - using high-resolution version (300 DPI)`);
+                } else {
+                    pdf.addImage(imgData, 'JPEG', 0, 0, imageWidth, imageHeight);
+                }
                 
                 // Generate PDF blob
                 const pdfBlob = pdf.output('blob');

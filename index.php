@@ -6,25 +6,282 @@ session_start();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Font Merge App | Generate Custom Images</title>
+    <title>Data Merge Online - Free CSV to PDF Generator | Bulk Document Creation Tool</title>
+    <meta name="description" content="Free online data merge tool for CSV to PDF conversion. Create professional documents, certificates, and bulk PDFs with custom fonts. No software download required - works in your browser.">
+    <meta name="keywords" content="data merge, data merge online, CSV to PDF, bulk PDF generation, mail merge, document automation, PDF generator, CSV converter, merge data, PDF template, certificate generator, font customization, document processing, online data merge tool, free data merge, bulk document creation, CSV data merge, PDF merge tool, document generator, template merge, data merge software, online PDF generator, CSV merge, document automation tool, bulk PDF creator, mail merge online, data merge free, PDF template generator, certificate generator online, document merge tool, CSV to PDF converter, bulk document processing, online document generator, data merge tool free, PDF merge online, document creation tool, template generator, bulk PDF merge, online mail merge, data merge software free, CSV merge tool, document automation software, PDF generator online, bulk document generator, mail merge tool, data merge application, online document merge, CSV data merge tool, PDF creation tool, document merge software, bulk PDF generator online, mail merge software, data merge tool online, CSV to PDF merge, document generator online, template merge tool, data merge free online, PDF merge software, document creation software, bulk document merge, online PDF merge, data merge tool software, CSV merge software, document automation tool online, PDF generator software, bulk document creation tool, mail merge application, data merge online tool, CSV data merge software, PDF merge application, document merge application, bulk PDF creation, online document creation, data merge tool application, CSV merge application, document automation application, PDF generator application, bulk document application, mail merge application online, data merge application online, CSV data merge application, PDF merge application online, document merge application online, bulk PDF application, online document application, data merge application software, CSV merge application software, document automation application software, PDF generator application software, bulk document application software, mail merge application software, data merge application software online, CSV data merge application software, PDF merge application software online, document merge application software online, bulk PDF application software, online document application software">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow">
+    <meta name="author" content="Data Merge Online">
+    <meta name="publisher" content="Data Merge Online">
+    <meta name="copyright" content="Data Merge Online">
+    <meta name="language" content="en">
+    <meta name="revisit-after" content="7 days">
+    <meta name="distribution" content="global">
+    <meta name="rating" content="general">
+    <meta name="geo.region" content="US">
+    <meta name="geo.placename" content="United States">
+    <meta name="geo.position" content="39.50;-98.35">
+    <meta name="ICBM" content="39.50, -98.35">
+    <link rel="canonical" href="https://datamerge.online/">
+    <meta property="og:title" content="Data Merge Online - Free CSV to PDF Generator | Bulk Document Creation">
+    <meta property="og:description" content="Free online data merge tool for CSV to PDF conversion. Create professional documents, certificates, and bulk PDFs with custom fonts. No software download required.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://datamerge.online/">
+    <meta property="og:image" content="https://datamerge.online/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="Data Merge Online">
+    <meta property="og:locale" content="en_US">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Data Merge Online - Free CSV to PDF Generator">
+    <meta name="twitter:description" content="Free online data merge tool for CSV to PDF conversion. Create professional documents with custom fonts.">
+    <meta name="twitter:image" content="https://datamerge.online/og-image.jpg">
+    <meta name="twitter:site" content="@datamergeonline">
+    <meta name="twitter:creator" content="@datamergeonline">
+    <link rel="alternate" hreflang="en" href="https://datamerge.online/">
+    <link rel="alternate" hreflang="x-default" href="https://datamerge.online/">
+    <meta name="theme-color" content="#667eea">
+    <meta name="msapplication-TileColor" content="#667eea">
+    <meta name="msapplication-config" content="/browserconfig.xml">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Data Merge Online",
+        "description": "Free online data merge tool for CSV to PDF conversion. Create professional documents, certificates, and bulk PDFs with custom fonts.",
+        "url": "https://datamerge.online/",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Any",
+        "browserRequirements": "Requires JavaScript. Requires HTML5.",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "creator": {
+            "@type": "Organization",
+            "name": "Data Merge Online",
+            "url": "https://datamerge.online/"
+        },
+        "featureList": [
+            "CSV to PDF conversion",
+            "Bulk document generation",
+            "Custom font support",
+            "Drag and drop interface",
+            "Certificate generation",
+            "Template customization",
+            "High-resolution PDF output",
+            "A4 size standardization",
+            "Mobile responsive design"
+        ],
+        "screenshot": "https://datamerge.online/screenshot.jpg",
+        "softwareVersion": "1.0",
+        "datePublished": "2024-01-01",
+        "dateModified": "2024-01-01"
+    }
+    </script>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔤</text></svg>">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" id="jszip-cdn"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body {
-            background: #f6f8fa;
-            min-height: 100vh;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        .main-container {
-            max-width: 1500px;
-            margin: 40px auto;
-            background: #fff;
-            border-radius: 18px;
-            box-shadow: 0 4px 32px rgba(0,0,0,0.08);
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            height: 100vh;
             overflow: hidden;
-            display: flex;
-            min-height: 900px;
+            padding: 20px;
         }
+
+        /* Landing Page Styles */
+        .landing-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: 10000;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .landing-page.show {
+            display: block;
+        }
+
+        .landing-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .landing-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 10001;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .landing-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .landing-logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .landing-nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .landing-nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .landing-nav-links a:hover {
+            color: #667eea;
+        }
+
+        .landing-cta-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.3s ease;
+        }
+
+        .landing-cta-button:hover {
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        .landing-hero {
+            padding: 120px 0 80px;
+            text-align: center;
+            color: white;
+        }
+
+        .landing-hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .landing-hero p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .landing-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 4rem 0;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 16px;
+            text-align: center;
+            color: white;
+        }
+
+        .feature-card i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #ffd700;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card p {
+            opacity: 0.9;
+        }
+
+        .landing-cta {
+            text-align: center;
+            margin: 4rem 0;
+        }
+
+        .landing-cta .btn-primary {
+            background: white;
+            color: #667eea;
+            padding: 16px 32px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: inline-block;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .landing-cta .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+            color: #667eea;
+        }
+
+        /* Main App Styles */
+        .main-container {
+            display: none;
+            height: calc(100vh - 40px);
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+            flex-direction: row;
+        }
+
+        .main-container.show {
+            display: flex;
+        }
+
         .sidebar {
             width: 320px;
             background: #f8fafc;
@@ -408,12 +665,80 @@ session_start();
     </style>
 </head>
 <body>
+    <!-- Landing Page -->
+    <div class="landing-page" id="landingPage">
+        <div class="landing-header">
+            <div class="landing-container">
+                <nav class="landing-nav">
+                    <a href="#" class="landing-logo">Data Merge</a>
+                    <ul class="landing-nav-links">
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#how-it-works">How It Works</a></li>
+                        <li><a href="#pricing">Pricing</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                    <a href="#" class="landing-cta-button" onclick="showApp()">Get Started</a>
+                </nav>
+            </div>
+        </div>
 
+        <div class="landing-container">
+            <section class="landing-hero">
+                <h1>Free Online Data Merge Tool - CSV to PDF Generator</h1>
+                <p>Create professional documents with our free data merge online tool. Convert CSV data to PDFs with custom fonts, perfect for certificates, invitations, and bulk document generation. No software download required!</p>
+                <div class="landing-cta">
+                    <a href="#" class="btn-primary" onclick="showApp()">Start Data Merge Now - Free</a>
+                </div>
+            </section>
 
-    <div class="main-container">
-        <!-- Sidebar Controls -->
+            <section class="landing-features">
+                <div class="feature-card">
+                    <i class="fas fa-file-csv"></i>
+                    <h3>CSV Data Merge</h3>
+                    <p>Upload your CSV file and merge data with PDF templates. Perfect for mail merge, certificate generation, and bulk document creation.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-font"></i>
+                    <h3>Custom Font Support</h3>
+                    <p>Upload your own fonts and create unique, branded documents with personalized typography for professional data merge results.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-file-pdf"></i>
+                    <h3>High-Quality PDF Output</h3>
+                    <p>Generate crisp, high-resolution PDFs with A4 size standardization. Perfect for printing and professional document distribution.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-bolt"></i>
+                    <h3>Bulk Document Generation</h3>
+                    <p>Process hundreds of documents in seconds with our optimized bulk PDF generation system. Ideal for large-scale data merge projects.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-mobile-alt"></i>
+                    <h3>Online Data Merge Tool</h3>
+                    <p>Works seamlessly on desktop, tablet, and mobile devices. No software download required - complete data merge solution in your browser.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-shield-alt"></i>
+                    <h3>Secure Data Processing</h3>
+                    <p>Your data stays secure with client-side processing. No server storage of sensitive information during data merge operations.</p>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div class="main-container" id="mainApp">
         <div class="sidebar">
-            <h2><i class="fas fa-image"></i> Image Generator</h2>
+            <h2><i class="fas fa-file-csv"></i> Data Merge Tool</h2>
+            
+            <!-- Back to Landing Button -->
+            <div class="mb-2">
+                <button onclick="showLanding()" style="width: 100%; padding: 10px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: transform 0.2s ease;">
+                    <i class="fas fa-home"></i> Back to Landing Page
+                </button>
+            </div>
+            
             <div class="mb-2">
                 <label class="form-label">Upload Custom Font (.ttf, .otf)</label>
                 <div id="fontDropArea" class="border p-2 mb-1 text-center" style="cursor:pointer; background:#f8f9fa; font-size: 0.85rem;">
@@ -481,12 +806,38 @@ session_start();
             <div id="previewsContainer" class="preview-container"></div>
         </div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" id="jszip-cdn"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
                 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
                 <script src="app.js"></script>
+    
+    <script>
+        // Landing page functionality
+        function showApp() {
+            document.getElementById('landingPage').classList.remove('show');
+            document.getElementById('mainApp').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function showLanding() {
+            document.getElementById('landingPage').classList.add('show');
+            document.getElementById('mainApp').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // Show landing page by default
+        document.getElementById('landingPage').classList.add('show');
+    </script>
 </body>
 </html> 
